@@ -3,29 +3,41 @@ header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
 // دریافت داده‌های JSON از ورودی
-$data = json_decode(file_get_contents("php://input"), true);
 
-// حالا متغیرها رو از $data بخون
+// دریافت داده‌های JSON از ورودی
+$json = file_get_contents('php://input');
+$data = json_decode($json, true);
+
+// بررسی موفقیت‌آمیز بودن تجزیه JSON
+if ($data === null) {
+    echo json_encode(['success' => false, 'message' => 'داده‌های ارسالی نامعتبر هستند.']);
+    exit;
+}
+
+// استخراج فیلدها از داده‌های دریافتی
 $name = $data['name'] ?? '';
 $email = $data['email'] ?? '';
 $password = $data['password'] ?? '';
 $phone = $data['phone'] ?? '';
 $address = $data['address'] ?? '';
-$repassword = $data['repassword'] ?? '';
 
-// بررسی فیلدها
-$required_fields = ['name', 'email', 'password', 'phone', 'address','repassword'];
+// بررسی فیلدهای الزامی
+$required_fields = ['name', 'email', 'password', 'phone', 'address'];
 $errors = [];
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    // دریافت اطلاعات ورودی
-    $data = json_decode(file_get_contents("php://input"));
-
 
 foreach ($required_fields as $field) {
-    if (!isset($_POST[$field]) || empty(trim($_POST[$field]))) {
+    if (empty(trim($data[$field] ?? ''))) {
         $errors[] = "فیلد $field الزامی است.";
     }
 }
+
+if (!empty($errors)) {
+    echo json_encode(['success' => false, 'message' => implode(' ', $errors)]);
+    exit;
+}
+
+// ادامه‌ی فرآیند ثبت‌نام...
+?>
 
 if (!empty($errors)) {
     // ارسال پاسخ با خطاها
