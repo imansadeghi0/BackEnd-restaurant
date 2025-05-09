@@ -2,16 +2,43 @@
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
+// دریافت داده‌های JSON از ورودی
+$data = json_decode(file_get_contents("php://input"), true);
 
+// حالا متغیرها رو از $data بخون
+$name = $data['name'] ?? '';
+$email = $data['email'] ?? '';
+$password = $data['password'] ?? '';
+$phone = $data['phone'] ?? '';
+$address = $data['address'] ?? '';
+$repassword = $data['repassword'] ?? '';
+
+// بررسی فیلدها
+$required_fields = ['name', 'email', 'password', 'phone', 'address','repassword'];
+$errors = [];
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // دریافت اطلاعات ورودی
     $data = json_decode(file_get_contents("php://input"));
-    if (!empty($_POST['txt_name']) && !empty($_POST['txt_email']) && !empty($_POST['txt_phone']) && !empty($_POST['txt_address']) && !empty($_POST['txt_password']) && !empty($_POST['txt_repassword'])){
+
+
+foreach ($required_fields as $field) {
+    if (!isset($_POST[$field]) || empty(trim($_POST[$field]))) {
+        $errors[] = "فیلد $field الزامی است.";
+    }
+}
+
+if (!empty($errors)) {
+    // ارسال پاسخ با خطاها
+    echo json_encode(['success' => false, 'message' => implode(' ', $errors)]);
+    exit;
+}
+
         $name = $data->name;
         $email = $data->email;
         $password = password_hash($data->password, PASSWORD_DEFAULT);
         $phone = $data->phone;
         $address = $data->address;
+        $password = $data->repassword;
     
         // اتصال به دیتابیس
         $conn = new mysqli("localhost", "root", "", "restaurant");
@@ -46,30 +73,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         }
     
         $conn->close();
-    }
-    else{
-        if (empty($_POST['txt_name']) || empty($_POST['txt_email']) || empty($_POST['txt_phone']) || empty($_POST['txt_address']) || empty($_POST['txt_password']) || empty($_POST['txt_repassword'])){
-            echo json_encode(array("success" => false , "massage" => "لطفا موارد خواسته شده را وارد کنید"));
-        }
-        elseif (empty($_POST['txt_name'])){
-            echo json_encode(array("success" => false , "massage" => "لطفا  نام خود را وارد کنید"));
-        }
-        elseif (empty($_POST['txt_phone'])){
-            echo json_encode(array("success" => false , "massage" => "شماره تماس خود را وارد کنید"));
-        }
-        elseif (empty($_POST['txt_email'])){
-            echo json_encode(array("success" => false , "massage" => "لطفا  ایمیل خود را وارد کنید"));
-        }
-        elseif (empty($_POST['txt_address'])){
-            echo json_encode(array("success" => false , "massage" => "لطفا  آدرس  خود را وارد کنید"));
-        }
-        elseif (empty($_POST['txt_password'])){
-            echo json_encode(array("success" => false , "massage" => "لطفا  پسورد  خود را وارد کنید"));
-        }
-        elseif (empty($_POST['txt_repassword'])){
-            echo json_encode(array("success" => false , "massage" => "لطفا  تکرار پسورد  خود را وارد کنید"));
-        }
-    }
     
 }
 ?>
