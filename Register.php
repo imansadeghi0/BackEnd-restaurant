@@ -2,7 +2,7 @@
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: POST, GET, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type");
-
+include 'db.php'; 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // دریافت اطلاعات ورودی
     $data = json_decode(file_get_contents("php://input"));
@@ -12,8 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $phone = $data->phone;
         $address = $data->address;
     
-        // اتصال به دیتابیس
-        $conn = new mysqli("localhost", "root", "", "restaurant");
+ 
     
         if ($conn->connect_error) {
             die(json_encode(array("success" => false, "message" => "مشکل در اتصال به پایگاه داده")));
