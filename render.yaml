@@ -1,8 +1,6 @@
 services:
   - type: web
     name: backend-restaurant
-    env: php
+    env: docker
     plan: free
-    buildCommand: ""
-    startCommand: ""
     rootDir: .
