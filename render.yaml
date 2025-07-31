@@ -1,0 +1,8 @@
+services:
+  - type: web
+    name: backend-restaurant
+    env: php
+    plan: free
+    buildCommand: ""
+    startCommand: ""
+    rootDir: .
